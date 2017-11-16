@@ -157,9 +157,9 @@ class FilteringController:
         #     print(params['image'])
         #     print('file does not exist')
         input_image = cv2.imread(image_path, 0)
-        image_output_path = 'controllers/assets/images/out/dog_out.png'
+        image_output_path = 'controllers/assets/images/out/' + params['image'] + '_out.png'
         cv2.imwrite(image_output_path, input_image)
         view = View()
-        output = view.render(message=[image_output_path,image_output_path])
+        output = view.render(message=[image_output_path,image_output_path,image_output_path])
         return '200 okay', output
         # return [dft_image, filtered_image, contrast_stretch_image]
