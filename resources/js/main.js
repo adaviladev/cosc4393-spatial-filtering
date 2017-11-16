@@ -33,6 +33,7 @@ class Form {
         this.updateFields();
     }
     setEventListeners() {
+        document.getElementById('operation').addEventListener('input', event => this.updateOperationType(event));
         document.getElementById('image').addEventListener('input', event => this.updateImage(event));
         document.getElementById('cutoff').addEventListener('input', event => this.validateCutoff(event));
         document.getElementById('order').addEventListener('input', event => this.validateOrder(event));
@@ -40,6 +41,10 @@ class Form {
         document.getElementById('statistical-filter').addEventListener('input', event => this.validateFilter(event));
         document.getElementById('smoothing-filter').addEventListener('input', event => this.validateFilter(event));
         document.getElementById('submit').addEventListener('click', () => this.handleSubmit(event));
+    }
+
+    updateOperationType(event) {
+        this.filterParams.operationType = event.target.value;
     }
 
     updateImage(event) {
