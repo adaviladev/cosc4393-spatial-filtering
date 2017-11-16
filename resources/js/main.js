@@ -33,13 +33,46 @@ class Form {
         this.updateFields();
     }
     setEventListeners() {
-        document.getElementById('operation').addEventListener('input', event => this.updateOperationType(event));
-        document.getElementById('image').addEventListener('input', event => this.updateImage(event));
-        document.getElementById('cutoff').addEventListener('input', event => this.validateCutoff(event));
-        document.getElementById('order').addEventListener('input', event => this.validateOrder(event));
-        document.getElementById('windowSize').addEventListener('input', event => this.validateWindowSize(event));
-        document.getElementById('statistical-filter').addEventListener('input', event => this.validateFilter(event));
-        document.getElementById('smoothing-filter').addEventListener('input', event => this.validateFilter(event));
+        let fieldNames = [
+            {
+                "name": "operation",
+                "function": this.updateOperationType
+            },
+            {
+                "name": "image",
+                "function": this.updateImage
+            },
+            {
+                "name": "cutoff",
+                "function": this.validateCutoff
+            },
+            {
+                "name": "order",
+                "function": this.validateOrder
+            },
+            {
+                "name": "statistical-filter",
+                "function": this.validateWindowSize
+            },
+            {
+                "name": "operation",
+                "function": this.validateWindowSize
+            },
+            {
+                "name": "smoothing-filter",
+                "function": this.validateFilter
+            }
+        ];
+        fieldNames.forEach((param) => {
+            document.getElementById(param.name).addEventListener('input', event => param.function(event));
+        });
+        // document.getElementById('operation').addEventListener('input', event => this.updateOperationType(event));
+        // document.getElementById('image').addEventListener('input', event => this.updateImage(event));
+        // document.getElementById('cutoff').addEventListener('input', event => this.validateCutoff(event));
+        // document.getElementById('order').addEventListener('input', event => this.validateOrder(event));
+        // document.getElementById('windowSize').addEventListener('input', event => this.validateWindowSize(event));
+        // document.getElementById('statistical-filter').addEventListener('input', event => this.validateFilter(event));
+        // document.getElementById('smoothing-filter').addEventListener('input', event => this.validateFilter(event));
         document.getElementById('submit').addEventListener('click', () => this.handleSubmit(event));
     }
 
@@ -50,14 +83,15 @@ class Form {
     updateImage(event) {
         this.filterParams.image = event.target.value;
     }
+
     updateFields () {
-        this.imageElem.value = this.filterParams.image;
-        this.operationTypeElem.value = this.filterParams.operationType;
-        this.cutoffElem.value = this.filterParams.cutoff;
-        this.windowSizeElem.value = this.filterParams.windowSize;
-        this.statisticalFilterElem.value = this.filterParams.statisticalFilter;
-        this.smoothingFilterElem.value = this.filterParams.smoothingFilter;
-        this.orderElem.value = this.filterParams.order;
+        this.filterParams.operationType = this.operationTypeElem.value;
+        this.filterParams.image = this.imageElem.value;
+        this.filterParams.cutoff = this.cutoffElem.value;
+        this.filterParams.windowSize = this.windowSizeElem.value;
+        this.filterParams.statisticalFilter = this.statisticalFilterElem.value;
+        this.filterParams.smoothingFilter = this.smoothingFilterElem.value;
+        this.filterParams.order = this.orderElem.value;
     }
 
     static sanitize(input) {
@@ -76,12 +110,12 @@ class Form {
     }
 
     validateWindowSize(event) {
-        this.filterParams.windowSize = Form.sanitize(event.target.value);
+        this.filterParams.windowSize = event.target.value;
         this.updateFields();
     }
 
     validateFilter(event) {
-        this.filterParams.filter = Form.sanitize(event.target.value);
+        this.filterParams.filter = event.target.value;
         this.updateFields();
     }
 
