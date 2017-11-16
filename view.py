@@ -71,8 +71,8 @@ def render_template_byres(template, context):
 
 
 class View:
-    def __init__(self, file_name, image = False):
-        self._template_path = 'resources/views/' + file_name + '.html'
+    def __init__(self):
+        self._template_path = 'resources/views/empty.html'
         with open(self._template_path, 'rb') as f:
             template_bytes = f.read()
         self._template = template_bytes
@@ -86,7 +86,7 @@ class View:
 if __name__ == "__main__":
     a = open('index.html', 'rb').read()
     z = render_template_byres(
-        b"{% for x in range(length) %}{{ x }},{% endfor %}",
+        b"{% for x in range(length) %}{{x}},{% endfor %}",
         {'length': 4})
     assert z == b'0,1,2,3,', "Bad render_template_byres()"
     z = render_template_byres(
@@ -94,6 +94,6 @@ if __name__ == "__main__":
         {'x': 4, 'y': 'q', 'z': b'4'})
     assert z == b'4 q 4', "Bad render_template_byres()"
 
-    view = View('index.html')
+    view = View()
     assert isinstance(view._template, bytes)
     assert isinstance(view.render(), bytes)

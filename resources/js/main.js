@@ -1,25 +1,26 @@
 class Form {
     constructor() {
+        this.toggleable = ['windowSize', 'statistical-filter', 'smoothing-filter', 'cutoff', 'order'];
         this.filterParams = {};
-        this.imageElem = document.getElementById('image');
-        this.operationTypeElem = document.getElementById('operation');
-        this.cutoffElem = document.getElementById('cutoff');
-        this.windowSizeElem = document.getElementById('windowSize');
-        this.statisticalFilterElem = document.getElementById('statistical-filter');
-        this.smoothingFilterElem = document.getElementById('smoothing-filter');
-        this.orderElem = document.getElementById('order');
+        this.imageElem = $('#image');
+        this.operationTypeElem = $('#operation');
+        this.cutoffElem = $('#cutoff');
+        this.windowSizeElem = $('#windowSize');
+        this.statisticalFilterElem = $('#statistical-filter');
+        this.smoothingFilterElem = $('#smoothing-filter');
+        this.orderElem = $('#order');
         this.setDefaultValues();
         this.setEventListeners();
     }
 
     setDefaultValues() {
-        let image = document.getElementById('image').value;
-        let operationType = document.getElementById('operation').value;
-        let cutoff = document.getElementById('cutoff').value || 0;
-        let windowSize = document.getElementById('windowSize').value || 0;
-        let statisticalFilter = document.getElementById('statistical-filter').value || 0;
-        let smoothingFilter = document.getElementById('smoothing-filter').value || 0;
-        let order = document.getElementById('order').value || 2;
+        let operationType = $('#operation').value;
+        let image = $('#image').value;
+        let cutoff = $('#cutoff').value || 0;
+        let windowSize = $('#windowSize').value || 0;
+        let statisticalFilter = $('#statistical-filter').value || 0;
+        let smoothingFilter = $('#smoothing-filter').value || 0;
+        let order = $('#order').value || 2;
         this.filterParams = {
             image,
             operationType,
@@ -30,107 +31,17 @@ class Form {
             order
         };
         $('.source-image').attr('src', '/controllers/assets/images/' + image);
-        this.updateFields();
     }
+
     setEventListeners() {
-        let fieldNames = [
-            {
-                "name": "operation",
-                "function": this.updateOperationType
-            },
-            {
-                "name": "image",
-                "function": this.updateImage
-            },
-            {
-                "name": "cutoff",
-                "function": this.validateCutoff
-            },
-            {
-                "name": "order",
-                "function": this.validateOrder
-            },
-            {
-                "name": "statistical-filter",
-                "function": this.validateWindowSize
-            },
-            {
-                "name": "operation",
-                "function": this.validateWindowSize
-            },
-            {
-                "name": "smoothing-filter",
-                "function": this.validateFilter
-            }
-        ];
-        fieldNames.forEach((param) => {
-            document.getElementById(param.name).addEventListener('input', event => param.function(event));
-        });
-        // document.getElementById('operation').addEventListener('input', event => this.updateOperationType(event));
-        // document.getElementById('image').addEventListener('input', event => this.updateImage(event));
-        // document.getElementById('cutoff').addEventListener('input', event => this.validateCutoff(event));
-        // document.getElementById('order').addEventListener('input', event => this.validateOrder(event));
-        // document.getElementById('windowSize').addEventListener('input', event => this.validateWindowSize(event));
-        // document.getElementById('statistical-filter').addEventListener('input', event => this.validateFilter(event));
-        // document.getElementById('smoothing-filter').addEventListener('input', event => this.validateFilter(event));
-        document.getElementById('submit').addEventListener('click', () => this.handleSubmit(event));
-    }
-
-    updateOperationType(event) {
-        this.filterParams.operationType = event.target.value;
-    }
-
-    updateImage(event) {
-        this.filterParams.image = event.target.value;
-    }
-
-    updateFields () {
-        this.filterParams.operationType = this.operationTypeElem.value;
-        this.filterParams.image = this.imageElem.value;
-        this.filterParams.cutoff = this.cutoffElem.value;
-        this.filterParams.windowSize = this.windowSizeElem.value;
-        this.filterParams.statisticalFilter = this.statisticalFilterElem.value;
-        this.filterParams.smoothingFilter = this.smoothingFilterElem.value;
-        this.filterParams.order = this.orderElem.value;
-    }
-
-    static sanitize(input) {
-        console.log(input);
-        return input.replace(/\D+/gi, '');
-    }
-
-    validateCutoff(event) {
-        this.filterParams.cutoff = Form.sanitize(event.target.value);
-        this.updateFields();
-    }
-
-    validateOrder(event) {
-        this.filterParams.order = Form.sanitize(event.target.value);
-        this.updateFields();
-    }
-
-    validateWindowSize(event) {
-        this.filterParams.windowSize = event.target.value;
-        this.updateFields();
-    }
-
-    validateFilter(event) {
-        this.filterParams.filter = event.target.value;
-        this.updateFields();
-    }
-
-    handleSubmit() {
-        $.ajax({
-            url: `http://localhost:8080/${this.filterParams.operationType}`,
-            data: this.filterParams,
-            success: function(data) {
-                console.log(data);
-                $('.image-out').attr('src', data);
-            },
-            fail: function(error) {
-                console.log(error);
-            }
-        });
+        this.operationTypeElem.addEventListener('input', event => this.updateOperationType(event));
+        this.imageElem.addEventListener('input', event => this.updateImage(event));
+        this.cutoffElem.addEventListener('input', event => this.validateCutoff(event));
+        this.orderElem.addEventListener('input', event => this.validateOrder(event));
+        this.windowSizeElem.addEventListener('input', event => this.validateWindowSize(event));
+        this.statisticalFilterElem.addEventListener('input', event => this.validateFilter(event));
+        this.smoothingFilterElem.addEventListener('input', event => this.validateFilter(event));
+        $('#submit').addEventListener('click', () => this.handleSubmit(event));
     }
 
     /**
@@ -151,6 +62,94 @@ class Form {
      *      Window Size: [3x3, 5x5, and 7x7]
      * }
      */
+    updateOperationType(event) {
+        this.filterParams.operationType = event.target.value;
+        if(this.filterParams.operationType === 'smoothing') {
+            this.toggleable.forEach((name) => {
+                this.toggleDisplay(name, 'none');
+            });
+            this.toggleDisplay('smoothing-filter', 'block');
+            this.toggleDisplay('window-size', 'block');
+        } else if(this.filterParams.operationType === 'statistical-order-filtering') {
+            this.toggleable.forEach((name) => {
+                this.toggleDisplay(name, 'none');
+            });
+            this.toggleDisplay('statistical-filter', 'block');
+            this.toggleDisplay('window-size', 'block');
+        } else if(this.filterParams.operationType === 'laplacian') {
+            this.toggleable.forEach((name) => {
+                this.toggleDisplay(name, 'none');
+            });
+            this.toggleDisplay('statistical-filter', 'block');
+            this.toggleDisplay('window-size', 'block');
+        }
+    }
+
+    updateImage(event) {
+        this.filterParams.image = event.target.value;
+        $('.source-image').attr('src', '/controllers/assets/images/' + this.filterParams.image);
+    }
+
+    toggleDisplay(name, state) {
+        $('.' + name + '-wrapper').css('display', state);
+    }
+
+    static sanitize(input) {
+        return input.replace(/\D+/gi, '');
+    }
+
+    validateCutoff(event) {
+        this.filterParams.cutoff = Form.sanitize(event.target.value);
+    }
+
+    validateOrder(event) {
+        this.filterParams.order = Form.sanitize(event.target.value);
+    }
+
+    validateWindowSize(event) {
+        this.filterParams.windowSize = event.target.value;
+    }
+
+    validateFilter(event) {
+        this.filterParams.filter = event.target.value;
+    }
+
+    handleSubmit() {
+        $.ajax({
+            url: `http://localhost:8080/${this.filterParams.operationType}`,
+            data: this.filterParams,
+            success: function(data) {
+                let paths = data.slice(1).slice(0, -1).split("\n\n");
+                console.log(paths);
+                paths.forEach((path) => {
+                    let imageHTML = '';
+                    imageHTML += '<div class="column">';
+                    imageHTML += '<img src="' + path + '" alt="" class="image image-out">';
+                    imageHTML += '</div>';
+                    $('.results-wrapper').append(imageHTML);
+                });
+            },
+            error: function (jqXHR, exception) {
+                let msg = '';
+                if (jqXHR.status === 0) {
+                    msg = 'Not connect.\n Verify Network.';
+                } else if (jqXHR.status === 404) {
+                    msg = 'Requested page not found. [404]';
+                } else if (jqXHR.status === 500) {
+                    msg = 'Internal Server Error [500].';
+                } else if (exception === 'parsererror') {
+                    msg = 'Requested JSON parse failed.';
+                } else if (exception === 'timeout') {
+                    msg = 'Time out error.';
+                } else if (exception === 'abort') {
+                    msg = 'Ajax request aborted.';
+                } else {
+                    msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                }
+                console.error(msg);
+            }
+        });
+    }
 }
 
 new Form();
